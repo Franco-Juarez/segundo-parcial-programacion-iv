@@ -41,4 +41,27 @@ describe('TodoApp', () => {
         await userEvent.click(task);
         expect(task).not.toHaveStyle({textDecoration: 'line-through'});
     })
+
+    test('permite elminar una tarea', async () => {
+        render(<TodoApp />)
+        
+        const input = screen.getByPlaceholderText(/nueva tarea/i);
+        const button = screen.getByRole('button', {name: /agregar/i});
+        
+        await userEvent.type(input, 'Tarea a borrar');
+        await userEvent.click(button);
+        
+        expect(screen.getByText('Tarea a borrar')).toBeInTheDocument();
+        
+        const deleteBtn = screen.getByRole('button', {name: /borrar/i});
+
+        await userEvent.click(deleteBtn);
+
+        // Diferencia entre getByText y queryByText:
+        // getByText: lanza error si no encuentra → usar cuando esperas que sí esté
+        // queryByText: retorna null si no encuentra → usar cuando esperas que no esté
+        expect(screen.queryByText('Tarea a borrar')).not.toBeInTheDocument();
+
+    })
+
 })

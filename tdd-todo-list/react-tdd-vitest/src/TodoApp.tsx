@@ -1,4 +1,3 @@
-import { pointer } from "@testing-library/user-event/dist/cjs/pointer/index.js";
 import { useState } from "react";
 
 type Task = {
@@ -23,6 +22,10 @@ export const TodoApp = () => {
         ));
     }
 
+    const eliminar = (index: number) => {
+        setTasks(prev => prev.filter((_, i) => i !== index))
+    }
+
     return (
         <div>
             {tasks.length === 0 && <p>No hay tareas</p>}
@@ -43,6 +46,14 @@ export const TodoApp = () => {
                 }}
                 key={i}>
                     {t.text}
+                    <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        eliminar(i);
+                    }}
+                    >
+                    Borrar
+                    </button>
                 </li>))
             }</ul>
 
