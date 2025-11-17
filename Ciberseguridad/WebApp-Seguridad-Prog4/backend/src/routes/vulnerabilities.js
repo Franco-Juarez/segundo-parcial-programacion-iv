@@ -1,18 +1,32 @@
 const express = require('express');
-const router = express.Router();
 const vulnerabilityController = require('../controllers/vulnerabilityController');
 const { uploadMiddleware, uploadFile } = require('../controllers/uploadController');
 
-// Command Injection
-router.post('/ping', vulnerabilityController.ping);
+// Crear router base
+const createRouter = (csrfProtection) => {
+  const router = express.Router();
 
-// CSRF - Transferencia
-router.post('/transfer', vulnerabilityController.transfer);
+  // Command Injection
+  router.post('/ping', vulnerabilityController.ping);
 
-// Local File Inclusion
-router.get('/file', vulnerabilityController.readFile);
+  // CSRF - Transferencia (protegida con CSRF si está disponible)
+  if (csrfProtection) {
+    router.post('/transfer', csrfProtection, vulnerabilityController.transfer);
+  } else {
+    router.post('/transfer', vulnerabilityController.transfer);
+  }
 
-// File Upload
-router.post('/upload', uploadMiddleware, uploadFile);
+  // Local File Inclusion
+  router.get('/file', vulnerabilityController.readFile);
 
-module.exports = router;
+  // File Upload
+  router.post('/upload', uploadMiddleware, uploadFile);
+
+  return router;
+};
+
+// Exportar como router por defecto (para compatibilidad con tests)
+module.exports = createRouter();
+
+// También exportar como función
+module.exports = createRouter;
